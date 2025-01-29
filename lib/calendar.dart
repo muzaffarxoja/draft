@@ -9,6 +9,7 @@ class MultiSelectCalendar extends StatefulWidget {
 }
 
 class _MultiSelectCalendarState extends State<MultiSelectCalendar> {
+  DateTime _today = DateTime.now();
   DateTime _focusedDay = DateTime.now();
   Set<DateTime> _selectedDays = {};
 
@@ -66,8 +67,11 @@ class _MultiSelectCalendarState extends State<MultiSelectCalendar> {
           firstDay: DateTime.utc(2024, 1, 1),
           lastDay: DateTime.utc(2025, 12, 31),
           focusedDay: _focusedDay,
+          startingDayOfWeek: StartingDayOfWeek.monday,
+          weekendDays: const [DateTime.sunday],
           selectedDayPredicate: (day) {
-            return _selectedDays.contains(DateTime(day.year, day.month, day.day));
+            return _selectedDays
+                .contains(DateTime(day.year, day.month, day.day));
           },
           calendarBuilders: CalendarBuilders(
             defaultBuilder: (context, day, focusedDay) {
@@ -91,7 +95,8 @@ class _MultiSelectCalendarState extends State<MultiSelectCalendar> {
                       '${day.day}',
                       style: TextStyle(
                         color: hasColor ? Colors.black : null,
-                        fontWeight: isToday ? FontWeight.bold : FontWeight.normal,
+                        fontWeight:
+                            isToday ? FontWeight.bold : FontWeight.normal,
                       ),
                     ),
                   ),
