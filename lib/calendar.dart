@@ -9,14 +9,12 @@ class MultiSelectCalendar extends StatefulWidget {
 }
 
 class _MultiSelectCalendarState extends State<MultiSelectCalendar> {
-  DateTime _today = DateTime.now();
+  late DateTime _today; // Normalized today’s date
+  bool _isTodaySelected = false;
   DateTime _focusedDay = DateTime.now();
   Set<DateTime> _selectedDays = {};
 
-  // Map to store colors for specific dates
   final Map<DateTime, Color> _dayColors = {};
-
-  // Example color options
   final List<Color> _colorOptions = [
     Colors.blue.shade200,
     Colors.red.shade200,
@@ -25,6 +23,14 @@ class _MultiSelectCalendarState extends State<MultiSelectCalendar> {
     Colors.orange.shade200,
   ];
   int _currentColorIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+
+
+    _today = _normalizeDate(DateTime.now()); // Normalize once
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -70,59 +76,81 @@ class _MultiSelectCalendarState extends State<MultiSelectCalendar> {
           startingDayOfWeek: StartingDayOfWeek.monday,
           weekendDays: const [DateTime.sunday],
           selectedDayPredicate: (day) {
-            return _selectedDays
-                .contains(DateTime(day.year, day.month, day.day));
+            return _selectedDays.contains(_normalizeDate(day));
           },
           calendarBuilders: CalendarBuilders(
             defaultBuilder: (context, day, focusedDay) {
-              // Normalize the date for comparison
-              final normalizedDate = DateTime(day.year, day.month, day.day);
+              final normalizedDate = _normalizeDate(day);
               final hasColor = _dayColors.containsKey(normalizedDate);
-              final isToday = isSameDay(day, DateTime.now());
+              final isToday = isSameDay(normalizedDate, _today);
 
-              if (hasColor || isToday) {
-                return Container(
-                  margin: const EdgeInsets.all(4.0),
-                  decoration: BoxDecoration(
-                    color: hasColor ? _dayColors[normalizedDate] : null,
-                    border: isToday
-                        ? Border.all(color: Colors.blue, width: 2)
-                        : null,
-                    borderRadius: BorderRadius.circular(8.0),
-                  ),
-                  child: Center(
-                    child: Text(
-                      '${day.day}',
-                      style: TextStyle(
-                        color: hasColor ? Colors.black : null,
-                        fontWeight:
-                            isToday ? FontWeight.bold : FontWeight.normal,
-                      ),
+              return Container(
+                margin: const EdgeInsets.all(4.0),
+                decoration: BoxDecoration(
+                  color: hasColor
+                      ? _dayColors[normalizedDate] // Use selected color if available
+                      : (isToday ? Colors.blue.shade200 : null), // Otherwise, use blue for today
+
+              border: isToday
+              ? Border.all(color: hasColor ? Colors.black : Colors.blue, width: 2)
+                  : null,
+              borderRadius: BorderRadius.circular(8.0),
+
+              //   border: Border.all(
+                //     color: isToday
+                //         ? (hasColor ? Colors.black : Colors.blue)
+                //         : Colors.transparent,
+                //     width: isToday ? 2 : 0,
+                //   ),
+                //   borderRadius: BorderRadius.circular(8.0),
+                //
+              ),
+                child: Center(
+                  child: Text(
+                    '${day.day}',
+                    style: TextStyle(
+                      color: hasColor ? Colors.black : null,
+                      fontWeight: isToday ? FontWeight.bold : FontWeight.normal,
                     ),
                   ),
-                );
-              }
-              return null;
+                ),
+              );
             },
           ),
+
           onDaySelected: (selectedDay, focusedDay) {
             setState(() {
               _focusedDay = focusedDay;
-              final normalizedDate = DateTime(
-                selectedDay.year,
-                selectedDay.month,
-                selectedDay.day,
-              );
+              final normalizedDate = _normalizeDate(selectedDay);
 
-              // Toggle color on tap
+
+              // Toggle selection
+
+              if (isSameDay(normalizedDate, _today)) {
+                _isTodaySelected = !_isTodaySelected;
+              }
               if (_dayColors.containsKey(normalizedDate)) {
                 _dayColors.remove(normalizedDate);
               } else {
                 _dayColors[normalizedDate] = _colorOptions[_currentColorIndex];
               }
+
+
+             // print(_dayColors);
+
             });
           },
-          calendarStyle: const CalendarStyle(
+
+          calendarStyle: CalendarStyle(
+            todayTextStyle: const TextStyle(color: Colors.purpleAccent),
+            todayDecoration: BoxDecoration(
+
+              color: _isTodaySelected ? _dayColors[_today] : null, // Change color dynamically
+              shape: BoxShape.rectangle, // Change shape dynamically
+              borderRadius: BorderRadius.circular(8.0),
+              border: Border.all(color: Colors.greenAccent, width: 3),
+            ),
+
             outsideDaysVisible: false,
             weekendTextStyle: TextStyle(color: Colors.red),
           ),
@@ -139,5 +167,10 @@ class _MultiSelectCalendarState extends State<MultiSelectCalendar> {
         ),
       ],
     );
+  }
+
+  /// Normalizes a date (removes time components)
+  DateTime _normalizeDate(DateTime date) {
+    return DateTime(date.year, date.month, date.day);
   }
 }

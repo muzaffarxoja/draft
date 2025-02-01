@@ -24,31 +24,34 @@ class _ColoredCalendarState extends State<ColoredCalendar> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return
+      Column(
       children: [
         // Color selection buttons (fixed)
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: Row(
-            children: _colorOptions.asMap().entries.map((entry) {
-              final index = entry.key;
-              final color = entry.value;
+            children: _colorOptions.map((color) {
               return Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: InkWell(
-                  onTap: () => setState(() => _currentColorIndex = index),
+                  onTap: () {
+                    setState(() {
+                      _currentColorIndex = _colorOptions.indexOf(color);
+                    });
+                  },
                   child: Container(
                     width: 40,
                     height: 40,
                     decoration: BoxDecoration(
                       color: color,
                       border: Border.all(
-                        color: _currentColorIndex == index
+                        color: _colorOptions[_currentColorIndex] == color
                             ? Colors.black
                             : Colors.transparent,
                         width: 2,
                       ),
-                      shape: BoxShape.rectangle,
+                      borderRadius: BorderRadius.circular(20),
                     ),
                   ),
                 ),
@@ -56,6 +59,36 @@ class _ColoredCalendarState extends State<ColoredCalendar> {
             }).toList(),
           ),
         ),
+
+        // SingleChildScrollView(
+        //   scrollDirection: Axis.horizontal,
+        //   child: Row(
+        //     children: _colorOptions.asMap().entries.map((entry) {
+        //       final index = entry.key;
+        //       final color = entry.value;
+        //       return Padding(
+        //         padding: const EdgeInsets.all(8.0),
+        //         child: InkWell(
+        //           onTap: () => setState(() => _currentColorIndex = index),
+        //           child: Container(
+        //             width: 40,
+        //             height: 40,
+        //             decoration: BoxDecoration(
+        //               color: color,
+        //               border: Border.all(
+        //                 color: _currentColorIndex == index
+        //                     ? Colors.black
+        //                     : Colors.transparent,
+        //                 width: 2,
+        //               ),
+        //               shape: BoxShape.rectangle,
+        //             ),
+        //           ),
+        //         ),
+        //       );
+        //     }).toList(),
+        //   ),
+        // ),
 
         TableCalendar(
           firstDay: DateTime.utc(2024, 1, 1),
@@ -66,16 +99,19 @@ class _ColoredCalendarState extends State<ColoredCalendar> {
             defaultBuilder: (context, day, focusedDay) {
               final normalizedDate = _normalizeDate(day);
               final hasColor = _dayColors.containsKey(normalizedDate);
-              final isToday = isSameDay(day, DateTime.now());
+              final isToday = isSameDay(day, _normalizeDate(DateTime.now()));
 
               return Container(
                 margin: const EdgeInsets.all(2.0),
                 decoration: BoxDecoration(
-                  color: hasColor ? _dayColors[normalizedDate] : null,
+                  color: hasColor
+                      ? _dayColors[normalizedDate] // Use selected color if available
+                      : (isToday ? Colors.blue.shade200 : null), // Otherwise, use blue for today
+
                   border: isToday
-                      ? Border.all(color: Colors.blue, width: 2)
+                      ? Border.all(color: hasColor ? Colors.black : Colors.blue, width: 2)
                       : null,
-                  borderRadius: BorderRadius.circular(0), // Rectangular shape
+                  borderRadius: BorderRadius.circular(8.0),
                 ),
                 child: Center(
                   child: Text(
@@ -89,10 +125,15 @@ class _ColoredCalendarState extends State<ColoredCalendar> {
               );
             },
           ),
+
+
+
+
           onDaySelected: (selectedDay, focusedDay) {
             setState(() {
               _focusedDay = focusedDay;
               final normalizedDate = _normalizeDate(selectedDay);
+              final today = _normalizeDate(DateTime.now());
 
               if (_selectedDays.contains(normalizedDate)) {
                 _selectedDays.remove(normalizedDate);
@@ -101,8 +142,19 @@ class _ColoredCalendarState extends State<ColoredCalendar> {
                 _selectedDays.add(normalizedDate);
                 _dayColors[normalizedDate] = _colorOptions[_currentColorIndex];
               }
+
+              // Make sure today updates properly
+              if (isSameDay(normalizedDate, today)) {
+                _dayColors[today] = _colorOptions[_currentColorIndex];
+              }
             });
+
+           // print(_dayColors);
+
           },
+
+
+
           calendarStyle: const CalendarStyle(
             outsideDaysVisible: false,
             weekendTextStyle: TextStyle(color: Colors.red),
