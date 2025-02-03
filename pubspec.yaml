@@ -7,6 +7,7 @@ environment:
   sdk: ^3.6.1
 
 dependencies:
+  calendar_view: ^1.4.0
   flutter:
     sdk: flutter
   table_calendar:

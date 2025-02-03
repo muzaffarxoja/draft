@@ -97,33 +97,35 @@ class _ColoredCalendarState extends State<ColoredCalendar> {
           selectedDayPredicate: (day) => _selectedDays.contains(_normalizeDate(day)),
           calendarBuilders: CalendarBuilders(
             defaultBuilder: (context, day, focusedDay) {
-              final normalizedDate = _normalizeDate(day);
-              final hasColor = _dayColors.containsKey(normalizedDate);
-              final isToday = isSameDay(day, _normalizeDate(DateTime.now()));
+              final normalizedDay = _normalizeDate(day); // ✅ Ensure no time issues
+              final isToday = isSameDay(normalizedDay, _normalizeDate(DateTime.now()));
+              final hasColor = _dayColors.containsKey(normalizedDay);
+              final isSelected = _selectedDays.contains(normalizedDay);
 
               return Container(
-                margin: const EdgeInsets.all(2.0),
+                margin: const EdgeInsets.all(4.0),
                 decoration: BoxDecoration(
-                  color: hasColor
-                      ? _dayColors[normalizedDate] // Use selected color if available
-                      : (isToday ? Colors.blue.shade200 : null), // Otherwise, use blue for today
-
-                  border: isToday
-                      ? Border.all(color: hasColor ? Colors.black : Colors.blue, width: 2)
+                  color: isToday
+                      ? (isSelected ? _dayColors[normalizedDay] : Colors.yellow)
+                      : hasColor
+                      ? _dayColors[normalizedDay]
                       : null,
+                  shape: BoxShape.rectangle,
                   borderRadius: BorderRadius.circular(8.0),
+                  border: isToday ? Border.all(color: Colors.greenAccent, width: 3) : null,
                 ),
                 child: Center(
                   child: Text(
                     '${day.day}',
                     style: TextStyle(
-                      color: hasColor ? Colors.black : null,
+                      color: isToday ? Colors.green : hasColor ? Colors.black : null,
                       fontWeight: isToday ? FontWeight.bold : FontWeight.normal,
                     ),
                   ),
                 ),
               );
             },
+
           ),
 
 
@@ -155,9 +157,10 @@ class _ColoredCalendarState extends State<ColoredCalendar> {
 
 
 
-          calendarStyle: const CalendarStyle(
+          calendarStyle: CalendarStyle(
+            todayDecoration: const BoxDecoration(), // Disable default today styling
             outsideDaysVisible: false,
-            weekendTextStyle: TextStyle(color: Colors.red),
+            weekendTextStyle: const TextStyle(color: Colors.red),
           ),
         ),
 

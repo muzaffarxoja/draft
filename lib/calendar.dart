@@ -1,6 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 
+
+
+// Default Builder in CalendarBuilders
+
+// defaultBuilder: Customizes regular days.
+// todayBuilder: Customizes today's appearance.
+// selectedBuilder: Customizes selected dates.
+// outsideBuilder: Customizes outside month dates.
+// markerBuilder: Adds markers (dots, events, etc.).
+
+
 class MultiSelectCalendar extends StatefulWidget {
   const MultiSelectCalendar({Key? key}) : super(key: key);
 
@@ -85,7 +96,7 @@ class _MultiSelectCalendarState extends State<MultiSelectCalendar> {
               final isToday = isSameDay(normalizedDate, _today);
 
               return Container(
-                margin: const EdgeInsets.all(4.0),
+                margin: const EdgeInsets.all(6.0),
                 decoration: BoxDecoration(
                   color: hasColor
                       ? _dayColors[normalizedDate] // Use selected color if available
@@ -142,13 +153,13 @@ class _MultiSelectCalendarState extends State<MultiSelectCalendar> {
           },
 
           calendarStyle: CalendarStyle(
-            todayTextStyle: const TextStyle(color: Colors.purpleAccent),
+            todayTextStyle: const TextStyle(color: Colors.green),
             todayDecoration: BoxDecoration(
 
               color: _isTodaySelected ? _dayColors[_today] : null, // Change color dynamically
               shape: BoxShape.rectangle, // Change shape dynamically
               borderRadius: BorderRadius.circular(8.0),
-              border: Border.all(color: Colors.greenAccent, width: 3),
+              border: Border.all(color: Colors.redAccent, width: 2),
             ),
 
             outsideDaysVisible: false,
