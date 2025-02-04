@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'calendar.dart';
 import 'colored_calendar.dart';
+import 'time_table.dart';
 
 class MaterialSidebar extends StatefulWidget {
   const MaterialSidebar({Key? key}) : super(key: key);
@@ -194,7 +195,7 @@ class _MaterialSidebarState extends State<MaterialSidebar> {
 
       MultiSelectCalendar(),
       ColoredCalendar(),
-      MultiSelectCalendar(),
+      MedicalCalendarView(),
       MultiSelectCalendar(),
       MultiSelectCalendar(),
     ];
