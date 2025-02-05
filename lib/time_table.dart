@@ -3,20 +3,25 @@ import 'package:calendar_view/calendar_view.dart';
 import 'package:intl/intl.dart';
 
 class MedicalEvent {
-  final String title;
+  final String patientName; // More descriptive name
+  final String doctorName;
   final String description;
   final DateTime startTime;
   final DateTime endTime;
   final Color color;
 
   MedicalEvent({
-    required this.title,
+    required this.patientName,
+    required this.doctorName,
     required this.description,
     required this.startTime,
     required this.endTime,
     this.color = Colors.blue,
   });
+
+// ... (equality overrides as before)
 }
+
 
 class MedicalCalendarView extends StatefulWidget {
   const MedicalCalendarView({Key? key}) : super(key: key);
@@ -26,6 +31,21 @@ class MedicalCalendarView extends StatefulWidget {
 }
 
 class _MedicalCalendarViewState extends State<MedicalCalendarView> {
+
+  late EventController<MedicalEvent> _controller;
+
+
+  @override
+  void initState() {
+
+    super.initState();
+    _controller = EventController<MedicalEvent>(); // Initialize in initState
+    _controller.addAll(_getSampleEvents()); // Add events
+
+  }
+
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -33,10 +53,10 @@ class _MedicalCalendarViewState extends State<MedicalCalendarView> {
         title: const Text('Medical Schedule'),
       ),
       body: CalendarControllerProvider(
-        controller: EventController<MedicalEvent>()..addAll(_getSampleEvents()),
+        controller: _controller,//EventController<MedicalEvent>()..addAll(_getSampleEvents()),
         child: DayView<MedicalEvent>(
           heightPerMinute: 1.5,
-          //startDuration: const Duration(hours: 9),
+          initialDay: DateTime(2024, 5, 1),
           startHour: 9,  // Start the schedule at 9:00 AM
           endHour: 18,   // End the schedule at 6:00 PM
           timeLineBuilder: _customTimeLineBuilder,
@@ -48,21 +68,33 @@ class _MedicalCalendarViewState extends State<MedicalCalendarView> {
 
   List<CalendarEventData<MedicalEvent>> _getSampleEvents() {
     return [
-      CalendarEventData(
-        title: 'Терентьев М. В.',
-        description: 'Appointment with Верстакова А. Г.',
+      CalendarEventData<MedicalEvent>( // Specify MedicalEvent as the generic type
         date: DateTime(2024, 5, 1),
         startTime: DateTime(2024, 5, 1, 9, 0),
         endTime: DateTime(2024, 5, 1, 9, 30),
-        color: Colors.green.shade200,
+        title: 'sdfsf',
+        event: MedicalEvent( // Create the MedicalEvent instance
+          patientName: 'Терентьев М. В.',
+          doctorName: 'Верстакова А. Г.',
+          description: 'Appointment with Верстакова А. Г.',
+          startTime: DateTime(2024, 5, 1, 9, 0),
+          endTime: DateTime(2024, 5, 1, 9, 30),
+          color: Colors.green.shade200,
+        ),
       ),
-      CalendarEventData(
-        title: 'Шустрова Е. В.',
-        description: 'Appointment with Иванова Е. В.',
+      CalendarEventData<MedicalEvent>(
         date: DateTime(2024, 5, 1),
         startTime: DateTime(2024, 5, 1, 9, 0),
         endTime: DateTime(2024, 5, 1, 9, 30),
-        color: Colors.pink.shade200,
+        title: 'dsfsdffsdf',
+        event: MedicalEvent(
+          patientName: 'Шустрова Е. В.',
+          doctorName: 'Иванова Е. В.',
+          description: 'Appointment with Иванова Е. В.',
+          startTime: DateTime(2024, 5, 1, 9, 0),
+          endTime: DateTime(2024, 5, 1, 9, 30),
+          color: Colors.pink.shade200,
+        ),
       ),
     ];
   }
@@ -88,7 +120,7 @@ class _MedicalCalendarViewState extends State<MedicalCalendarView> {
 
     return Container(
       decoration: BoxDecoration(
-        color: events[0].color,
+        color: events[0].event?.color,
         borderRadius: BorderRadius.circular(8),
       ),
       child: Padding(
@@ -97,7 +129,7 @@ class _MedicalCalendarViewState extends State<MedicalCalendarView> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              events[0].title,
+              events[0].event?.patientName ?? '',
               style: const TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.bold,

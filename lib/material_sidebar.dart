@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import 'calendar.dart';
 import 'colored_calendar.dart';
+import 'models/medical_event_model.dart';
+import 'multi_column_day_view.dart';
 import 'time_table.dart';
 
 class MaterialSidebar extends StatefulWidget {
@@ -196,7 +198,25 @@ class _MaterialSidebarState extends State<MaterialSidebar> {
       MultiSelectCalendar(),
       ColoredCalendar(),
       MedicalCalendarView(),
-      MultiSelectCalendar(),
+      MultiColumnDayView(
+        doctors: [
+          DoctorSchedule(
+            doctorName: 'Верстакова А. Г.',
+            chairNumber: '#1',
+            columnColor: Colors.green,
+          ),
+          DoctorSchedule(
+            doctorName: 'Иванова Е. В.',
+            chairNumber: '#2',
+            columnColor: Colors.pink,
+          ),
+          DoctorSchedule(
+            doctorName: 'Брантова Г. К.',
+            chairNumber: '#3',
+            columnColor: Colors.purple,
+          ),
+        ],
+      ),
       MultiSelectCalendar(),
     ];
 
