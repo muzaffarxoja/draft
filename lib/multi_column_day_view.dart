@@ -41,23 +41,23 @@ class MultiColumnDayView extends StatefulWidget {
 
 class _MultiColumnDayViewState extends State<MultiColumnDayView> {
   late List<EventController<MedicalEvent>> _controllers;
+  late ScrollController _scrollController;
+  DateTime _currentDay = DateTime(2024, 5, 1);
 
   @override
   void initState() {
     super.initState();
     _initializeDateFormatting();
+    _scrollController = ScrollController();
     _controllers = List.generate(
       widget.doctors.length,
           (index) => EventController<MedicalEvent>()..addAll(_getSampleEvents(widget.doctors[index])),
     );
-
-
   }
 
   Future<void> _initializeDateFormatting() async {
     await initializeDateFormatting('ru_RU', null);
   }
-
 
   List<CalendarEventData<MedicalEvent>> _getSampleEvents(DoctorSchedule doctor) {
     // Sample events for each doctor
@@ -65,15 +65,15 @@ class _MultiColumnDayViewState extends State<MultiColumnDayView> {
       return [
         CalendarEventData<MedicalEvent>(
           title: '',
-          date: DateTime(2024, 5, 1),
-          startTime: DateTime(2024, 5, 1, 9, 0),
-          endTime: DateTime(2024, 5, 1, 9, 30),
+          date: _currentDay,
+          startTime: DateTime(_currentDay.year, _currentDay.month, _currentDay.day, 9, 0),
+          endTime: DateTime(_currentDay.year, _currentDay.month, _currentDay.day, 9, 30),
           event: MedicalEvent(
             patientName: 'Терентьев М. В.',
             doctorName: doctor.doctorName,
             chairNumber: doctor.chairNumber,
-            startTime: DateTime(2024, 5, 1, 9, 0),
-            endTime: DateTime(2024, 5, 1, 9, 30),
+            startTime: DateTime(_currentDay.year, _currentDay.month, _currentDay.day, 9, 0),
+            endTime: DateTime(_currentDay.year, _currentDay.month, _currentDay.day, 9, 30),
             color: doctor.columnColor,
           ),
         ),
@@ -82,16 +82,16 @@ class _MultiColumnDayViewState extends State<MultiColumnDayView> {
       return [
         CalendarEventData<MedicalEvent>(
           title: '',
-          date: DateTime(2024, 5, 1),
-          startTime: DateTime(2024, 5, 1, 9, 0),
-          endTime: DateTime(2024, 5, 1, 9, 30),
+          date: _currentDay,
+          startTime: DateTime(_currentDay.year, _currentDay.month, _currentDay.day, 9, 0),
+          endTime: DateTime(_currentDay.year, _currentDay.month, _currentDay.day, 9, 30),
           event: MedicalEvent(
             patientName: 'Шустрова Е. В.',
             doctorName: doctor.doctorName,
             chairNumber: doctor.chairNumber,
             notes: 'верх левая уд 14 17 18',
-            startTime: DateTime(2024, 5, 1, 9, 0),
-            endTime: DateTime(2024, 5, 1, 9, 30),
+            startTime: DateTime(_currentDay.year, _currentDay.month, _currentDay.day, 9, 0),
+            endTime: DateTime(_currentDay.year, _currentDay.month, _currentDay.day, 9, 30),
             color: doctor.columnColor,
           ),
         ),
@@ -100,34 +100,60 @@ class _MultiColumnDayViewState extends State<MultiColumnDayView> {
     return [];
   }
 
+  void _onDayChanged(DateTime newDay) {
+    setState(() {
+      _currentDay = newDay;
+      _controllers.forEach((controller) {
+        controller.removeAll([]);
+        controller.addAll(_getSampleEvents(widget.doctors[_controllers.indexOf(controller)]));
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          DateFormat('dd.MM.yyyy EEEE', 'ru_RU').format(DateTime(2024, 5, 1)),
+          DateFormat('dd.MM.yyyy EEEE', 'ru_RU').format(_currentDay),
           style: const TextStyle(fontSize: 16),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () => _onDayChanged(_currentDay.subtract(const Duration(days: 1))),
+          ),
+          IconButton(
+            icon: const Icon(Icons.arrow_forward),
+            onPressed: () => _onDayChanged(_currentDay.add(const Duration(days: 1))),
+          ),
+        ],
       ),
       body: Column(
         children: [
           _buildHeader(),
           Expanded(
-            child: Row(
-              children: List.generate(
-                widget.doctors.length,
-                    (index) => Expanded(
-                  child: CalendarControllerProvider(
-                    controller: _controllers[index],
-                    child: DayView<MedicalEvent>(
-                      heightPerMinute: 1.5,
-                      initialDay: DateTime(2024, 5, 1),
-                      startHour: 9,
-                      endHour: 15,
-                      timeLineBuilder: _customTimeLineBuilder,
-                      eventTileBuilder: _customEventTileBuilder,
-                      showVerticalLine: false,
-                      showLiveTimeLineInAllDays: false,
+            child: SingleChildScrollView(
+              controller: _scrollController,
+              child: Row(
+                children: List.generate(
+                  widget.doctors.length,
+                      (index) => Expanded(
+                    child: CalendarControllerProvider(
+                      controller: _controllers[index],
+                      child: SizedBox(
+                        height: 500,
+                        child: DayView<MedicalEvent>(
+                          heightPerMinute: 1.5,
+                          initialDay: _currentDay,
+                          startHour: 9,
+                          endHour: 15,
+                          timeLineBuilder: _customTimeLineBuilder,
+                          eventTileBuilder: _customEventTileBuilder,
+                          showVerticalLine: false,
+                          showLiveTimeLineInAllDays: false,
+                        ),
+                      ),
                     ),
                   ),
                 ),
@@ -225,27 +251,3 @@ class _MultiColumnDayViewState extends State<MultiColumnDayView> {
   }
 }
 
-// Usage example
-void main() {
-  runApp(MaterialApp(
-    home: MultiColumnDayView(
-      doctors: [
-        DoctorSchedule(
-          doctorName: 'Верстакова А. Г.',
-          chairNumber: '#1',
-          columnColor: Colors.green,
-        ),
-        DoctorSchedule(
-          doctorName: 'Иванова Е. В.',
-          chairNumber: '#2',
-          columnColor: Colors.pink,
-        ),
-        DoctorSchedule(
-          doctorName: 'Брантова Г. К.',
-          chairNumber: '#3',
-          columnColor: Colors.purple,
-        ),
-      ],
-    ),
-  ));
-}
