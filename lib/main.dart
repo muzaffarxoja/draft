@@ -2,7 +2,7 @@ import 'package:calendar_view/calendar_view.dart';
 import 'package:draft/material_sidebar.dart';
 import 'package:flutter/material.dart';
 
-import 'time_table.dart';
+import 'drafts/time_table.dart';
 
 
 void main() {
