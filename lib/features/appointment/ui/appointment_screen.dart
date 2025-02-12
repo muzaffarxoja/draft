@@ -56,17 +56,39 @@ class _ClinicSchedulerScreenState extends State<ClinicSchedulerScreen> {
     return [
       Appointment(
         startTime: DateTime(2024, 5, 1, 9, 0),
-        endTime: DateTime(2024, 5, 1, 10, 0),
+        endTime: DateTime(2024, 5, 1, 10,0 ),
         subject: 'Терентьев М. В.',
         color: Colors.green,
-        resourceIds: ['chair1'],
+        resourceIds: ['chair1'], // Assigned to Chair #1
+      ),
+      Appointment(
+        startTime: DateTime(2024, 5, 1, 10, 0),
+        endTime: DateTime(2024, 5, 1, 11,0 ),
+        subject: 'Терентьев М. В.',
+        color: Colors.green,
+        resourceIds: ['chair1'], // Assigned to Chair #1
       ),
       Appointment(
         startTime: DateTime(2024, 5, 1, 10, 0),
         endTime: DateTime(2024, 5, 1, 10, 15),
         subject: 'Пискарев А. В.',
         color: Colors.pink,
-        resourceIds: ['chair2'],
+        resourceIds: ['chair2'], // Assigned to Chair #2
+      ),
+      Appointment(
+        startTime: DateTime(2024, 5, 1, 9, 30),
+        endTime: DateTime(2024, 5, 1, 10, 0),
+        subject: 'Кузьмина Е. Н.',
+        color: Colors.purple,
+        resourceIds: ['chair3'], // Assigned to Chair #3
+      ),
+
+      Appointment(
+        startTime: DateTime(2024, 5, 1, 9, 0),
+        endTime: DateTime(2024, 5, 1, 9, 30),
+        subject: 'Теренть М. В.',
+        color: Colors.green,
+        resourceIds: ['chair4'], // Assigned to Chair #1
       ),
     ];
   }

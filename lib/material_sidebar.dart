@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import 'calendar.dart';
 import 'colored_calendar.dart';
+import 'features/appointment/ui/appointment_screen.dart';
 import 'models/medical_event_model.dart';
 import 'multi_column_day_view.dart';
 import 'drafts/time_table.dart';
@@ -198,7 +199,7 @@ class _MaterialSidebarState extends State<MaterialSidebar> {
 
       MultiSelectCalendar(),
       ColoredCalendar(),
-      MedicalCalendarView(),
+      ClinicSchedulerScreen(),
       TimetableScreen(),
       // MultiColumnDayView(
       //   doctors: [
@@ -219,7 +220,7 @@ class _MaterialSidebarState extends State<MaterialSidebar> {
       //     ),
       //   ],
       // ),
-      MultiSelectCalendar(),
+
     ];
 
     return pages[_selectedIndex];

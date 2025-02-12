@@ -24,7 +24,8 @@ class TimetableScreen extends StatelessWidget {
       showCurrentTimeIndicator: true,
       showTodayButton: true,
       showNavigationArrow: true,
-      initialDisplayDate: selectedDate,
+      initialDisplayDate: DateTime(2024, 5, 1),
+      //initialDisplayDate: selectedDate,
       dataSource: AppointmentDataSource(appointments, _getChairs()),
     );
   }

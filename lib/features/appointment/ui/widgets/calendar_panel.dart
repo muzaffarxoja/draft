@@ -10,6 +10,7 @@ class CalendarPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SfCalendar(
+      initialDisplayDate: DateTime(2024, 5, 1),
       view: CalendarView.month,
       firstDayOfWeek: 1,
       dataSource: AppointmentDataSource(appointments),
