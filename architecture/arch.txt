@@ -1,0 +1,200 @@
+lib/
+├── core/
+│   ├── errors/
+│   │   └── failures.dart
+│   ├── usecases/
+│   │   └── usecase.dart
+│   └── utils/
+│       └── date_utils.dart
+│
+├── features/
+│   └── appointments/
+│       ├── data/
+│       │   ├── datasources/
+│       │   │   ├── appointment_remote_data_source.dart
+│       │   │   └── appointment_local_data_source.dart
+│       │   ├── models/
+│       │   │   ├── appointment_model.dart
+│       │   │   └── resource_model.dart
+│       │   └── repositories/
+│       │       └── appointment_repository_impl.dart
+│       │
+│       ├── domain/
+│       │   ├── entities/
+│       │   │   ├── appointment.dart
+│       │   │   └── resource.dart
+│       │   ├── repositories/
+│       │   │   └── appointment_repository.dart
+│       │   └── usecases/
+│       │       ├── get_appointments.dart
+│       │       ├── get_resources.dart
+│       │       └── get_appointments_by_date.dart
+│       │
+│       └── presentation/
+│           ├── bloc/
+│           │   ├── appointment_bloc.dart
+│           │   ├── appointment_event.dart
+│           │   └── appointment_state.dart
+│           ├── pages/
+│           │   ├── clinic_scheduler_page.dart
+│           │   └── appointment_detail_page.dart
+│           └── widgets/
+│               ├── calendar_panel_widget.dart
+│               └── timetable_widget.dart
+│
+└── injection_container.dart
+
+// lib/features/appointments/domain/entities/appointment.dart
+class Appointment extends Equatable {
+  final DateTime startTime;
+  final DateTime endTime;
+  final String subject;
+  final Color color;
+  final List<String> resourceIds;
+
+  const Appointment({
+    required this.startTime,
+    required this.endTime,
+    required this.subject,
+    required this.color,
+    required this.resourceIds,
+  });
+
+  @override
+  List<Object> get props => [startTime, endTime, subject, resourceIds];
+}
+
+// lib/features/appointments/data/models/appointment_model.dart
+class AppointmentModel extends Appointment {
+  AppointmentModel({
+    required DateTime startTime,
+    required DateTime endTime,
+    required String subject,
+    required Color color,
+    required List<String> resourceIds,
+  }) : super(
+          startTime: startTime,
+          endTime: endTime,
+          subject: subject,
+          color: color,
+          resourceIds: resourceIds,
+        );
+
+  factory AppointmentModel.fromJson(Map<String, dynamic> json) {
+    return AppointmentModel(
+      startTime: DateTime.parse(json['startTime']),
+      endTime: DateTime.parse(json['endTime']),
+      subject: json['subject'],
+      color: Color(json['color']),
+      resourceIds: List<String>.from(json['resourceIds']),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'startTime': startTime.toIso8601String(),
+      'endTime': endTime.toIso8601String(),
+      'subject': subject,
+      'color': color.value,
+      'resourceIds': resourceIds,
+    };
+  }
+}
+
+// lib/features/appointments/domain/repositories/appointment_repository.dart
+abstract class AppointmentRepository {
+  Future<Either<Failure, List<Appointment>>> getAppointments();
+  Future<Either<Failure, List<Resource>>> getResources();
+  Future<Either<Failure, List<Appointment>>> getAppointmentsByDate(DateTime date);
+}
+
+// lib/features/appointments/data/datasources/appointment_remote_data_source.dart
+abstract class AppointmentRemoteDataSource {
+  Future<List<AppointmentModel>> getAppointments();
+  Future<List<ResourceModel>> getResources();
+}
+
+class AppointmentRemoteDataSourceImpl implements AppointmentRemoteDataSource {
+  final http.Client client;
+
+  AppointmentRemoteDataSourceImpl({required this.client});
+
+  @override
+  Future<List<AppointmentModel>> getAppointments() async {
+    // Implement API call
+    // Replace with your actual API endpoint
+    final response = await client.get(
+      Uri.parse('your-api-endpoint/appointments'),
+      headers: {'Content-Type': 'application/json'},
+    );
+
+    if (response.statusCode == 200) {
+      final List<dynamic> jsonList = json.decode(response.body);
+      return jsonList.map((json) => AppointmentModel.fromJson(json)).toList();
+    } else {
+      throw ServerException();
+    }
+  }
+}
+
+// lib/features/appointments/presentation/bloc/appointment_bloc.dart
+class AppointmentBloc extends Bloc<AppointmentEvent, AppointmentState> {
+  final GetAppointments getAppointments;
+  final GetResources getResources;
+
+  AppointmentBloc({
+    required this.getAppointments,
+    required this.getResources,
+  }) : super(AppointmentInitial()) {
+    on<LoadAppointments>(_onLoadAppointments);
+    on<LoadResources>(_onLoadResources);
+  }
+
+  Future<void> _onLoadAppointments(
+    LoadAppointments event,
+    Emitter<AppointmentState> emit,
+  ) async {
+    emit(AppointmentLoading());
+    final failureOrAppointments = await getAppointments(NoParams());
+    emit(failureOrAppointments.fold(
+      (failure) => AppointmentError(message: _mapFailureToMessage(failure)),
+      (appointments) => AppointmentsLoaded(appointments: appointments),
+    ));
+  }
+}
+
+// lib/features/appointments/presentation/widgets/timetable_widget.dart
+class TimetableWidget extends StatelessWidget {
+  final List<Appointment> appointments;
+  final List<Resource> resources;
+  final DateTime selectedDate;
+
+  const TimetableWidget({
+    Key? key,
+    required this.appointments,
+    required this.resources,
+    required this.selectedDate,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<AppointmentBloc, AppointmentState>(
+      builder: (context, state) {
+        if (state is AppointmentLoading) {
+          return Center(child: CircularProgressIndicator());
+        } else if (state is AppointmentsLoaded) {
+          return SfCalendar(
+            // ... your existing calendar configuration
+            dataSource: AppointmentDataSource(
+              appointments: state.appointments,
+              resources: state.resources,
+            ),
+          );
+        } else if (state is AppointmentError) {
+          return Center(child: Text(state.message));
+        }
+        return Container();
+      },
+    );
+  }
+}

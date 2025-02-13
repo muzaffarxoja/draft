@@ -1,12 +1,10 @@
+import 'package:draft/features/appointment/presentation/screens/appointment_screen.dart';
 import 'package:draft/time_table_screen.dart';
 import 'package:flutter/material.dart';
 
 import 'calendar.dart';
 import 'colored_calendar.dart';
-import 'features/appointment/ui/appointment_screen.dart';
-import 'models/medical_event_model.dart';
-import 'multi_column_day_view.dart';
-import 'drafts/time_table.dart';
+
 
 class MaterialSidebar extends StatefulWidget {
   const MaterialSidebar({Key? key}) : super(key: key);
