@@ -5,6 +5,9 @@ import '../../data/datasource/appointment_data_source.dart';
 import '../../data/repositories/appointment_repository_impl.dart';
 
 
+// calendar_panel.dart
+
+
 class CalendarPanel extends StatefulWidget {
   final DateTime selectedDate;
   final Function(DateTime) onDateSelected;
@@ -45,6 +48,7 @@ class _CalendarPanelState extends State<CalendarPanel> {
       });
     } catch (e) {
       setState(() => _isLoading = false);
+      // Handle error appropriately
       print('Error loading appointments: $e');
     }
   }
@@ -58,6 +62,8 @@ class _CalendarPanelState extends State<CalendarPanel> {
     return SfCalendar(
       view: CalendarView.month,
       initialSelectedDate: widget.selectedDate,
+      initialDisplayDate: DateTime(2024, 5, 1),
+      //initialSelectedDate: widget.selectedDate,
       onSelectionChanged: (CalendarSelectionDetails details) {
         widget.onDateSelected(details.date!);
       },
@@ -85,3 +91,6 @@ class _CalendarPanelState extends State<CalendarPanel> {
     );
   }
 }
+
+
+

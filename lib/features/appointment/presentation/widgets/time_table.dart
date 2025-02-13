@@ -64,7 +64,8 @@ class _TimetableScreenState extends State<TimetableScreen> {
     return SfCalendar(
       view: CalendarView.timelineDay,
       timeSlotViewSettings: TimeSlotViewSettings(
-        timelineAppointmentHeight: 50,
+        timelineAppointmentHeight: 100,
+
         minimumAppointmentDuration: Duration(minutes: 15),
         startHour: 9,
         endHour: 21,
@@ -85,7 +86,8 @@ class _TimetableScreenState extends State<TimetableScreen> {
         showAvatar: false,
         visibleResourceCount: 4,
       ),
-      initialDisplayDate: widget.selectedDate,
+      initialDisplayDate: DateTime(2024,5,1),
+      //initialDisplayDate: widget.selectedDate,
       dataSource: _appointmentDataSource,
       appointmentBuilder: _customAppointmentBuilder,
     );
