@@ -86,8 +86,8 @@ class _TimetableScreenState extends State<TimetableScreen> {
         showAvatar: false,
         visibleResourceCount: 4,
       ),
-      initialDisplayDate: DateTime(2024,5,1),
-      //initialDisplayDate: widget.selectedDate,
+      //initialDisplayDate: DateTime(2024,5,1),
+      initialDisplayDate: widget.selectedDate,
       dataSource: _appointmentDataSource,
       appointmentBuilder: _customAppointmentBuilder,
     );
