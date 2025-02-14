@@ -4,10 +4,6 @@ import 'package:syncfusion_flutter_calendar/calendar.dart';
 import '../../data/datasource/appointment_data_source.dart';
 import '../../data/repositories/appointment_repository_impl.dart';
 
-
-// calendar_panel.dart
-
-
 class CalendarPanel extends StatefulWidget {
   final DateTime selectedDate;
   final Function(DateTime) onDateSelected;
@@ -63,7 +59,7 @@ class _CalendarPanelState extends State<CalendarPanel> {
       view: CalendarView.month,
       initialSelectedDate: widget.selectedDate,
       initialDisplayDate: DateTime(2024, 5, 1),
-      //initialSelectedDate: widget.selectedDate,
+      //initialDisplayDate:widget.selectedDate
       onSelectionChanged: (CalendarSelectionDetails details) {
         widget.onDateSelected(details.date!);
       },
@@ -88,9 +84,30 @@ class _CalendarPanelState extends State<CalendarPanel> {
       ),
       cellBorderColor: Colors.grey[300],
       dataSource: _appointmentDataSource,
+      monthCellBuilder: _monthCellBuilder,
+    );
+  }
+
+  Widget _monthCellBuilder(BuildContext context, MonthCellDetails details) {
+    final totalAppointmentTime = _appointmentDataSource?.getTotalAppointmentTimeForDate(details.date) ?? Duration.zero;
+    final workingDayDuration = Duration(hours: 8); // Assuming an 8-hour working day
+    final colorIntensity = (totalAppointmentTime.inMinutes / workingDayDuration.inMinutes).clamp(0.0, 1.0);
+    final cellColor = Colors.blue.withOpacity(colorIntensity);
+
+    return Container(
+      decoration: BoxDecoration(
+        color: cellColor,
+        border: Border.all(color: Colors.grey[300]!),
+      ),
+      child: Center(
+        child: Text(
+          details.date.day.toString(),
+          style: TextStyle(
+            color: Colors.black87,
+            fontSize: 12,
+          ),
+        ),
+      ),
     );
   }
 }
-
-
-

@@ -22,4 +22,11 @@ class AppointmentDataSource extends CalendarDataSource {
         date1.month == date2.month &&
         date1.day == date2.day;
   }
+
+  Duration getTotalAppointmentTimeForDate(DateTime date) {
+    final appointmentsForDate = getAppointmentsForDate(date);
+    return appointmentsForDate.fold(Duration.zero, (total, appointment) {
+      return total + appointment.endTime.difference(appointment.startTime);
+    });
+  }
 }

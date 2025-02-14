@@ -81,12 +81,12 @@ class TimetableScreen extends StatelessWidget {
   List<Appointment> _getAppointments() {
     return [
       Appointment(
-        startTime: DateTime(2024, 5, 1, 9, 0),
-        endTime: DateTime(2024, 5, 1, 10,0 ),
-        subject: 'Терентьев М. В.',
-        color: Colors.green,
-        resourceIds: ['chair1'], // Assigned to Chair #1
-      ),
+          startTime: DateTime(2024, 5, 1, 9, 0),
+          endTime: DateTime(2024, 5, 1, 10,0 ),
+          subject: 'Терентьев М. В.',
+          color: Colors.green,
+          resourceIds: ['chair1'], // Assigned to Chair #1
+        ),
       Appointment(
         startTime: DateTime(2024, 5, 1, 10, 0),
         endTime: DateTime(2024, 5, 1, 11,0 ),
