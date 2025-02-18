@@ -1,5 +1,7 @@
+import 'package:dartz/dartz.dart';
+import '../../../../core/error/failures.dart';
 import '../entities/patient.dart';
 
 abstract class PatientRepository {
-  Future<List<Patient>> getPatients();
+  Future<Either<Failure, List<Patient>>> getPatients();
 }
