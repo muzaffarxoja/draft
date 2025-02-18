@@ -15,6 +15,16 @@ class PatientModel extends Patient {
     mobilePhone: mobilePhone,
   );
 
+  Patient toDomain() {
+    return Patient(
+      id: id,
+      fullName: fullName,
+      birthDate: birthDate,
+      age: age,
+      mobilePhone: mobilePhone,
+    );
+  }
+
   factory PatientModel.fromJson(Map<String, dynamic> json) {
     return PatientModel(
       id: json['id'],
@@ -34,4 +44,7 @@ class PatientModel extends Patient {
       'mobile_phone': mobilePhone, // Convert back to snake_case
     };
   }
+
+
+
 }

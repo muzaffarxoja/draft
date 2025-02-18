@@ -12,4 +12,6 @@ class Patient {
     required this.age,
     required this.mobilePhone,
   });
+
+
 }
